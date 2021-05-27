@@ -3,9 +3,10 @@
     <head>
         <title>Interface entre Eventee y Wordpress</title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script type="text/javascript" src="./papaparse.min.js"></script>
+        <script type="text/javascript" src="./static/papaparse.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/json2csv"></script>
     </head>
     <body>
         <div id="app">
@@ -39,8 +40,12 @@
         </div>
         <iframe id="my_iframe" style="display:none;"></iframe>
     </body>
+    
+    <script src="./static/logic.js"></script>
     <script>
-        Vue.config.devtools = true
+        
+        Vue.config.devtools = true;
+        Vue.config.debug = true;
         var app = new Vue({
             el: '#app',
             data: {
@@ -92,17 +97,35 @@
                     })
                 },
                 expSpeaker: ()=>{
-                    $.ajax('/webservices/speakersCSV',{
-                        type: 'POST',
-                        data: {token: this.token,hall: this.selected},
-                        success: function (data, status, xhr) {
-                            console.log("Exito: ");
-                            Download('http://localhost:3000/'+'csvs/'+data)
-                        }
-                    });
-                },
-                
-
+                   buildCSV(app.$data.token)
+                    .then(result=>{  
+                        const fields = [
+                            'Title',
+                            'speaker_nombre',
+                            'speaker_bio',
+                            'speaker_empresa',
+                            'speaker_puesto',
+                            'speaker_rs_facebook',
+                            'speaker_rs_instagram',
+                            'speaker_rs_linkedin',
+                            'speaker_rs_pinterest',
+                            'speaker_rs_twitter',
+                            'speaker_rs_youtube', 
+                            'speaker_sitio_web'
+                        ];
+                        const csv = ConvertToCSV(result) 
+                        //const json2csvParser = new json2csv.Parser({ fields });
+                        //json2csvParser.parse(result);
+                        const nameFile = 'eventee'+Date.now()+'.csv'
+                        var a = document.createElement('a');
+                        a.href = 'data:atachment/csv,' + encodeURIComponent(csv);
+                        a.target = '_black';
+                        a.download = nameFile;
+                        document.body.appendChild(a);
+                        a.click();
+                        return nameFile;
+                    })                    
+                },               
             }
         })
         function impSpeakers(speakers){
@@ -134,6 +157,21 @@
         }
         function Download(url) {
             document.getElementById('my_iframe').src = url;
+        };
+        function ConvertToCSV(objArray) {
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+                for (var index in array[i]) {
+                    if (line != '') line += ','
+
+                    line += array[i][index];
+                }
+
+                str += line + '\r\n';
+            }
+            return str;
         };
     </script>
 </html>
