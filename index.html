@@ -41,7 +41,6 @@
         <iframe id="my_iframe" style="display:none;"></iframe>
     </body>
     
-    <script src="./static/logic.js"></script>
     <script>
         
         Vue.config.devtools = true;
@@ -54,6 +53,9 @@
                 selected: ""
             },
             methods: {
+                /** Method to get the Halls of the Eventee API
+                 *  This dropbox is used to
+                 */
                 HallsList: function(){
                     axios.get('https://eventee.co/public/api/v1/content',{
                         headers: {
@@ -69,6 +71,11 @@
                         this.halls = halls;
                     })
                 },
+                /** This works as a Front petition
+                 *  Imports the data of a csv, returns a object with the data,
+                 *  sends the object to the Speaker API and POST it to the 
+                 *  prefered Hall.
+                 */
                 csvSpeakers: ()=>{
                     Papa.parse(document.getElementById('uploadedDataSpeakers').files[0],{
                         download: true,
@@ -78,6 +85,11 @@
                         }
                     })
                 },
+                /** This works as a Front petition
+                 *  Imports the data of a csv, returns a object with the data,
+                 *  sends the object to the Lectures API and POST it to the 
+                 *  prefered Hall.
+                 */
                 csvLectures: ()=>{
                     Papa.parse(document.getElementById('uploadedDataLectures').files[0],{
                         download: true,
@@ -87,6 +99,11 @@
                         }
                     })
                 },
+                /** This works as a Front petition
+                 *  Imports the data of a csv, returns a object with the data,
+                 *  sends the object to the Workshops API and POST it to the 
+                 *  prefered Hall.
+                 */
                 csvWorkshops: ()=>{
                     Papa.parse(document.getElementById('uploadedDataWorkshops').files[0],{
                         download: true,
@@ -96,6 +113,11 @@
                         }
                     })
                 },
+                /** This works as a Front petition
+                 *  GET the API data, select the data and creates an object
+                 *  this object is returned and is parsed into a CSV and is
+                 *  downloaded by the user of the app
+                 */
                 expSpeaker: ()=>{
                    buildCSV(app.$data.token)
                     .then(result=>{  
@@ -128,6 +150,9 @@
                 },               
             }
         })
+        /** This function is the Petition to the middleware
+         *  Sends the petition and the data to the controller
+         */
         function impSpeakers(speakers){
             $.ajax('/webservices/impSpeakers',{
                 type: 'POST',
@@ -137,6 +162,9 @@
                 }
             });
         }
+        /** This function is the Petition to the middleware
+         *  Sends the petition and the data to the controller
+         */
         function impLectures(lectures){
             $.ajax('/webservices/impLectures',{
                 type: 'POST',
@@ -146,6 +174,9 @@
                 }
             });
         }
+        /** This function is the Petition to the middleware
+         *  Sends the petition and the data to the controller
+         */
         function impWorkshops(workshops){
             $.ajax('/webservices/impWorkshops',{
                 type: 'POST',
@@ -155,9 +186,13 @@
                 }
             });
         }
+        // this function download the content of a page.
         function Download(url) {
             document.getElementById('my_iframe').src = url;
         };
+        /** This function converts an object to a CSV formated string
+         * 
+         */
         function ConvertToCSV(objArray) {
             var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
             var str = '';
@@ -173,5 +208,46 @@
             }
             return str;
         };
+        /** This function GET the content of the event and using the data
+         *  creates a formated CSV Ready to be imported into Wordpress
+         * 
+         */
+        function buildCSV(token){
+            return new Promise((resolve,reject)=>{
+                axios.get('https://eventee.co/public/api/v1/content',{
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+token
+                    },
+                })
+                .then(function (response) {
+                    // handle success
+                    var result = [];
+                    var halls = response.data.halls;
+                    var speakers = response.data.speakers;
+                    var lectures = response.data.lectures;
+                    var workshops = response.data.workshops;
+                    speakers.forEach(element=>{
+                        result.push({
+                            Title: element.name,
+                            speaker_nombre: element.name,
+                            speaker_bio: element.bio,
+                            speaker_empresa: element.company,
+                            speaker_puesto: element.position,
+                            speaker_rs_facebook: element.facebook === ''? '#':element.facebook,
+                            speaker_rs_instagram: "#",
+                            speaker_rs_linkedin: element.linkedIn === ''? '#':element.linkedIn,
+                            speaker_rs_pinterest: "#",
+                            speaker_rs_twitter: element.twitter === ''? '#':element.twitter,
+                            speaker_rs_youtube: "#",
+                            speaker_sitio_web: element.web === ''? '#':element.web
+                        })
+                    })
+                    resolve(result);
+                })
+                .catch(e=>reject(console.error("Error in buildCSV: "+e)))
+            })
+            
+        }
     </script>
 </html>
