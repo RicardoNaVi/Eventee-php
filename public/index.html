@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Interface entre Eventee y Wordpress</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script type="text/javascript" src="./papaparse.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <label>Ingresa el Token del Evento:</label>
+            <input id="token" v-model="token" type="text" placeholder="Ej: vB4DTHSTZR0Dz1aatUhlbNbaqgiYb4z91lJR3v6DpyZI9UkI1xu4jdKn5KZMRa3JuvT7gnZwBo5ak5ZVXJAEgohb02Eu18VLS34CT00AsmjfXsPHuFnmZSVyjGXhhRIsY5X5hThs8DqP1uHS8rIqQW8hWzlk8Zduhj6iXpV7W8YkjvN40ZTETl47kY4g29">
+            <button v-on:click="HallsList">Check Event</button>
+            <div v-if="halls.length > 0">
+                <label for="hall">Escoge el Escenario:</label>
+                <select id="hall" v-model="selected" for="hall">
+                    <option v-for="hall in halls" v-bind:value="hall.value">{{hall.text}}</option>
+                </select>
+                <br>
+                <button v-on:click="expSpeaker">Export Speakers</button>
+                <br>
+                <label>Import Speakers:</label>
+                <input type="file" id="uploadedDataSpeakers" accept=".csv" />
+                <button id="btnSpeakers" v-on:click="csvSpeakers">Import Speakers</button>
+        
+                <br>
+                <label>Import Lectures:</label>
+                <input type="file" id="uploadedDataLectures" accept=".csv" />
+                <button id="btnLectures" v-on:click="csvLectures">Import Lectures</button>
+                <div style="display: none;">
+                    <br>
+                    <label>Import Workshops:</label>
+                    <input type="file" id="uploadedDataWorkshops" accept=".csv" />        
+                    <button id="btnWorkshops" v-on:click="csvWorkshops">Import Workshops</button>
+                </div>
+            </div>
+    
+        </div>
+        <iframe id="my_iframe" style="display:none;"></iframe>
+    </body>
+    <script>
+        Vue.config.devtools = true
+        var app = new Vue({
+            el: '#app',
+            data: {
+                token: "",
+                halls: [],
+                selected: ""
+            },
+            methods: {
+                HallsList: function(){
+                    axios.get('https://eventee.co/public/api/v1/content',{
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer '+this.token
+                        },
+                    })
+                    .then((response)=>{
+                        var halls = [];
+                        response.data.halls.forEach(element => {
+                            halls.push({text: element.name,value: element.id});
+                        });
+                        this.halls = halls;
+                    })
+                },
+                csvSpeakers: ()=>{
+                    Papa.parse(document.getElementById('uploadedDataSpeakers').files[0],{
+                        download: true,
+                        header: false,
+                        complete: function(result){
+                            impSpeakers(result.data);
+                        }
+                    })
+                },
+                csvLectures: ()=>{
+                    Papa.parse(document.getElementById('uploadedDataLectures').files[0],{
+                        download: true,
+                        header: false,
+                        complete: function(result){
+                            impLectures(result.data);
+                        }
+                    })
+                },
+                csvWorkshops: ()=>{
+                    Papa.parse(document.getElementById('uploadedDataWorkshops').files[0],{
+                        download: true,
+                        header: false,
+                        complete: function(result){
+                            impWorkshops(result.data);
+                        }
+                    })
+                },
+                expSpeaker: ()=>{
+                    $.ajax('/webservices/speakersCSV',{
+                        type: 'POST',
+                        data: {token: this.token,hall: this.selected},
+                        success: function (data, status, xhr) {
+                            console.log("Exito: ");
+                            Download('http://localhost:3000/'+'csvs/'+data)
+                        }
+                    });
+                },
+                
+
+            }
+        })
+        function impSpeakers(speakers){
+            $.ajax('/webservices/impSpeakers',{
+                type: 'POST',
+                data: {speakers: speakers,token: app.$data.token,hall: app.$data.selected},
+                success: function (data, status, xhr) {
+                    alert('Speakers updated');
+                }
+            });
+        }
+        function impLectures(lectures){
+            $.ajax('/webservices/impLectures',{
+                type: 'POST',
+                data: {lectures: lectures,token: app.$data.token,hall: app.$data.selected},
+                success: function (data, status, xhr) {
+                    alert('Lectures updated');
+                }
+            });
+        }
+        function impWorkshops(workshops){
+            $.ajax('/webservices/impWorkshops',{
+                type: 'POST',
+                data: {workshops: workshops,token: app.$data.token,hall: app.$data.selected},
+                success: function (data, status, xhr) {
+                    alert('Workshops updated');
+                }
+            });
+        }
+        function Download(url) {
+            document.getElementById('my_iframe').src = url;
+        };
+    </script>
+</html>

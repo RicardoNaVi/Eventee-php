@@ -9,11 +9,6 @@ const { Parser } = require('json2csv');
 const toWordpress = require("../controllers/webservices/toWordpress");
 const toEventee = require("../controllers/webservices/toEventee");
 
-
-/** This is a middleware
- * Here is sended the information to a controller to create a CSV 
- * to be imported into Wordpress
- */
 router.post('/speakersCSV',(req,res)=>{
     toWordpress.buildCSV(req.body.token).then(result=>{  
         const fields = [

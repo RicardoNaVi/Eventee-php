@@ -5,9 +5,6 @@ const fs = require('fs');
 const path = require('path');
 const app_dir = path.dirname(require.main.filename);
 
-/**
- * This route sends to the index.html file
- */
 router.get('/',(req,res) =>{
     fs.readFile(path.join(
         app_dir,'public/'+'index.html',() => {
