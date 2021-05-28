@@ -21,11 +21,11 @@ function impLectures(lectures,token,hall){
             start =""+new Date(rstart).getUTCFullYear()+ "-"+(new Date(rstart).getUTCMonth()+1)+"-" +new Date(rstart).getUTCDate()+" "+addZero(new Date(rstart).getUTCHours())+":"+addZero(new Date(rstart).getUTCMinutes())+":"+addZero(new Date(rstart).getUTCSeconds());
             end = ""+ new Date(rend).getUTCFullYear()+ "-"+(new Date(rend).getUTCMonth()+1)+"-" +new Date(rend).getUTCDate()+" "+addZero(new Date(rend).getUTCHours())+":"+addZero(new Date(rend).getUTCMinutes())+":"+addZero(new Date(rend).getUTCSeconds());
             var data = JSON.stringify({
-                'name': element[1],
-                'description': element[6],
-                'start': start,
-                'end': end,
-                'hall_id': parseInt(hall,10)
+                name: element[1],
+                description: element[6],
+                start: start,
+                end: end,
+                hall_id: parseInt(hall,10)
             });
             var conf = {
                 method: 'post',
