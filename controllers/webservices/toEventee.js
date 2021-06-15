@@ -54,16 +54,16 @@ function impSpeakers(speakers,token,hall){
             if(element[0] !== 'Title'){
                 axios.post('https://eventee.co/public/api/v1/speaker',{
                     name: element[0],
-                    company: element[2],
-                    position: element[3],
-                    bio: element[5],
-                    web: element[6] === '#'?'':element[6],
-                    linkedIn: element[7] === '#'?'':element[7],
-                    facebook: element[8] === '#'?'':element[8],
-                    twitter: element[9] === '#'?'':element[9],
-                    country: "MX",
-                    languages: "Spanish",
-                    photo: element[16],
+                    company: element[1],
+                    position: element[2],
+                    bio: element[3],
+                    web: element[4] === '#'?'':element[4],
+                    linkedIn: element[5] === '#'?'':element[5],
+                    facebook: element[6] === '#'?'':element[6],
+                    twitter: element[7] === '#'?'':element[7],
+                    country: element[11] === '#'?'':element[11],
+                    languages: element[12] === '#'?'':element[12],
+                    photo: element[13],
                 },{
                     headers: {
                         'Content-Type': 'application/json',
