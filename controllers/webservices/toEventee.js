@@ -61,6 +61,7 @@ function impSpeakers(speakers,token,hall){
                     linkedIn: element[5] === '#'?'':element[5],
                     facebook: element[6] === '#'?'':element[6],
                     twitter: element[7] === '#'?'':element[7],
+                    instagram: element[8] === ''?'':element[8],
                     country: element[11] === '#'?'':element[11],
                     languages: element[12] === '#'?'':element[12],
                     photo: element[13],
