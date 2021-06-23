@@ -82,7 +82,7 @@ function impSpeakers(speakers,token,hall){
     }).catch(e=>console.error("impSpeakers error: "+e))
 }
 
-function updSpeakers(speakersCSV,speakerEventee,token,hall){
+function updSpeakers(speakersCSV,speakerEventee,token){
     return new Promise((resolve,reject)=>{
         //Aqui hago la peticion de todos los monos
         speakersCSV.forEach(csv=>{
@@ -114,7 +114,7 @@ function updSpeakers(speakersCSV,speakerEventee,token,hall){
                         'Authorization': 'Bearer '+token,
                         'Accept': 'application/json'
                     },
-                }).catch(e=>reject(console.error("axios "+element[1]+" error: "+e)))
+                }).catch(e=>reject(console.error("axios update "+element[1]+" error: "+e)))
             }else{
                 element.forEach(el=>{
                     console.log(el)
@@ -122,7 +122,59 @@ function updSpeakers(speakersCSV,speakerEventee,token,hall){
             }
         })
         resolve(true);
-    }).catch(e=>console.error("impSpeakers error: "+e))
+    }).catch(e=>console.error("updSpeakers error: "+e))
+}
+
+function delAllSpeakers(speakerEventee,token){
+    return new Promise((resolve,reject)=>{
+        speakerEventee.forEach(element=>{
+            console.log("ID "+element.id+": "+ element.name + " deleted")
+            if(element[0] !== 'Title'){
+                axios.delete('https://eventee.co/public/api/v1/speaker/'+element[14],{},{
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+token,
+                        'Accept': 'application/json'
+                    },
+                }).catch(e=>reject(console.error("axios delete all "+element[1]+" error: "+e)))
+            }else{
+                element.forEach(el=>{
+                    console.log(el)
+                })
+            }
+        })
+        resolve(true);
+    }).catch(e=>console.error("delAllSpeakers error: "+e))
+}
+
+function delSpeakers(speakersCSV,speakerEventee,token){
+    return new Promise((resolve,reject)=>{
+        //Aqui hago la peticion de todos los monos
+        speakersCSV.forEach(csv=>{
+            speakerEventee.forEach(eventee=>{
+                if((csv[0] === eventee.name) && csv[14] === undefined){
+                    csv.push(eventee.id);
+                }
+            })
+        })
+        speakersCSV.forEach(element=>{
+            console.log("ID "+element[14]+": "+ element[0] + " deleted")
+            if(element[0] !== 'Title'){
+                axios.delete('https://eventee.co/public/api/v1/speaker/'+element[14],{},{
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+token,
+                        'Accept': 'application/json'
+                    },
+                }).catch(e=>reject(console.error("axios delete"+element[1]+" error: "+e)))
+            }else{
+                element.forEach(el=>{
+                    console.log(el)
+                })
+            }
+        })
+        resolve(true);
+    }).catch(e=>console.error("delSpeakers error: "+e))
 }
 
 function impWorkshops(workshops,token,hall){
@@ -136,5 +188,7 @@ module.exports = {
     impLectures: impLectures,
     impWorkshops: impWorkshops,
     impSpeakers: impSpeakers,
-    updSpeakers: updSpeakers
+    updSpeakers: updSpeakers,
+    delAllSpeakers: delAllSpeakers,
+    delSpeakers: delSpeakers
 }

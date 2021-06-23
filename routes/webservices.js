@@ -52,8 +52,19 @@ router.post('/impSpeakers',(req,res)=>{
 });
 
 router.post('/updSpeakers',(req,res)=>{
+    toEventee.updSpeakers(req.body.speakersCSV,req.body.speakersEventee,req.body.token).then(result=>{
+        return res.status(200).send(result);
+    })
+});
 
-    toEventee.updSpeakers(req.body.speakersCSV,req.body.speakersEventee,req.body.token,req.body.hall).then(result=>{
+router.post('/delAllSpeakers',(req,res)=>{
+    toEventee.delAllSpeakers(req.body.speakersEventee,req.body.token).then(result=>{
+        return res.status(200).send(result);
+    })
+});
+
+router.post('/delSpeakers',(req,res)=>{
+    toEventee.delSpeakers(req.body.speakersCSV,req.body.speakersEventee,req.body.token).then(result=>{
         return res.status(200).send(result);
     })
 });
