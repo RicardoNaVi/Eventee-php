@@ -2,40 +2,76 @@
 <html>
     <head>
         <title>Interface entre Eventee y Wordpress</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script type="text/javascript" src="./papaparse.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     </head>
     <body>
-        <div id="app">
-            <label>Ingresa el Token del Evento:</label>
-            <input id="token" v-model="token" type="text" placeholder="Ej: vB4DTHSTZR0Dz1aatUhlbNbaqgiYb4z91lJR3v6DpyZI9UkI1xu4jdKn5KZMRa3JuvT7gnZwBo5ak5ZVXJAEgohb02Eu18VLS34CT00AsmjfXsPHuFnmZSVyjGXhhRIsY5X5hThs8DqP1uHS8rIqQW8hWzlk8Zduhj6iXpV7W8YkjvN40ZTETl47kY4g29">
-            <button v-on:click="HallsList">Check Event</button>
-            <div v-if="halls.length > 0">
-                <label for="hall">Escoge el Escenario:</label>
-                <select id="hall" v-model="selected" for="hall">
-                    <option v-for="hall in halls" v-bind:value="hall.value">{{hall.text}}</option>
-                </select>
-                <br>
-                <button v-on:click="expSpeaker">Export Speakers</button>
-                <br>
-                <label>Import Speakers:</label>
-                <input type="file" id="uploadedDataSpeakers" accept=".csv" />
-                <button id="btnSpeakers" v-on:click="csvSpeakers">Import Speakers</button>
-        
-                <br>
-                <label>Import Lectures:</label>
-                <input type="file" id="uploadedDataLectures" accept=".csv" />
-                <button id="btnLectures" v-on:click="csvLectures">Import Lectures</button>
-                <div style="display: none;">
-                    <br>
-                    <label>Import Workshops:</label>
-                    <input type="file" id="uploadedDataWorkshops" accept=".csv" />        
-                    <button id="btnWorkshops" v-on:click="csvWorkshops">Import Workshops</button>
+        <div class="container" id="app" style="margin-top: 3%;">
+            <div class="row" style="margin: 10px;">
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <span class="input-group-text">Ingresa el Token del Evento</span>
+                        <textarea id="token" v-model="token" class="form-control" style="height: 100px;" placeholder="Ej: vB4DTHSTZR0Dz1aatUhlbNbaqgiYb4z91lJR3v6DpyZI9UkI1xu4jdKn5KZMRa3JuvT7gnZwBo5ak5ZVXJAEgohb02Eu18VLS34CT00AsmjfXsPHuFnmZSVyjGXhhRIsY5X5hThs8DqP1uHS8rIqQW8hWzlk8Zduhj6iXpV7W8YkjvN40ZTETl47kY4g29"></textarea>
+                      </div>
+                </div>
+                <div class="col-md-2" style="margin: auto;">
+                    <button class="btn btn-primary" v-on:click="HallsList">Check Event</button>
                 </div>
             </div>
-    
+            
+            <div class="row" v-if="halls.length > 0">
+                
+                <div class="row" style="margin: 10px;">
+                    <div class="col-md-10">
+                        <label for="hall" class="form-label">Escoge el Escenario:</label>
+                        <select class="form-select" id="hall" v-model="selected" for="hall">
+                            <option v-for="hall in halls" v-bind:value="hall.value">{{hall.text}}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2" style="margin: auto;">
+                        <button class="btn btn-primary" v-on:click="expSpeaker">Export Speakers</button>
+                    </div>
+
+                </div>
+                
+                <div class="row" style="margin: 10px;">
+                    <div class="col-md-8">
+                        <label for="Speakers" class="form-label">Import Speakers:</label>
+                        <input class="form-control" type="file" id="uploadedDataSpeakers" accept=".csv" />
+                    </div>
+                    <div class="col-md-2" style="margin: auto;">
+                        <button class="btn btn-primary" id="btnSpeakers" v-on:click="csvSpeakers">Import Speakers</button>
+                    </div>
+                    <div class="col-md-2" style="margin: auto;">
+                        <button class="btn btn-primary" id="btnSpeakersUpd" v-on:click="csvSpeakersUpd">Update Speakers</button>
+                    </div>
+
+                </div>
+                <div class="row" style="margin: 10px;">
+                    <div class="col-md-10">
+                        <label for="Lectures" class="form-label">Import Lectures:</label>
+                        <input class="form-control" type="file" id="uploadedDataLectures" accept=".csv" />
+                    </div>
+                    <div class="col-md-2" style="margin: auto;">
+                        <button class="btn btn-primary" id="btnLectures" v-on:click="csvLectures">Import Lectures</button>
+                    </div>
+                </div>
+                <div class="row" style="display: none;margin: 10px;">
+                    <div>
+                        <label for="Workshops" class="form-label">Import Workshops:</label>
+                        <input class="form-control" type="file" id="uploadedDataWorkshops" accept=".csv" />        
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" id="btnWorkshops" v-on:click="csvWorkshops">Import Workshops</button>
+                    </div>
+                </div>
+                
+            </div>
+
         </div>
         <iframe id="my_iframe" style="display:none;"></iframe>
     </body>
@@ -46,7 +82,8 @@
             data: {
                 token: "",
                 halls: [],
-                selected: ""
+                selected: "",
+                speakers: []
             },
             methods: {
                 HallsList: function(){
@@ -57,11 +94,16 @@
                         },
                     })
                     .then((response)=>{
+                        var speakers = [];
                         var halls = [];
                         response.data.halls.forEach(element => {
                             halls.push({text: element.name,value: element.id});
                         });
+                        response.data.speakers.forEach(speaker=>{
+                            speakers.push({id: speaker.id, name: speaker.name})
+                        })
                         this.halls = halls;
+                        this.speakers = speakers
                     })
                 },
                 csvSpeakers: ()=>{
@@ -70,6 +112,16 @@
                         header: false,
                         complete: function(result){
                             impSpeakers(result.data);
+                        }
+                    })
+                },
+                csvSpeakersUpd: ()=>{
+                    Papa.parse(document.getElementById('uploadedDataSpeakers').files[0],{
+                        download: true,
+                        header: false,
+                        complete: function(result){
+                            console.log(this.eventeeData)
+                            updSpeakers(result.data);
                         }
                     })
                 },
@@ -110,7 +162,16 @@
                 type: 'POST',
                 data: {speakers: speakers,token: app.$data.token,hall: app.$data.selected},
                 success: function (data, status, xhr) {
-                    alert('Speakers updated');
+                    alert('Speakers Inserted');
+                }
+            });
+        }
+        function updSpeakers(speakersCSV){
+            $.ajax('/webservices/updSpeakers',{
+                type: 'POST',
+                data: {speakersCSV: speakersCSV, speakersEventee: app.$data.speakers,token: app.$data.token,hall: app.$data.selected},
+                success: function (data, status, xhr) {
+                    alert('Speakers Updated');
                 }
             });
         }

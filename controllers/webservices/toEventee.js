@@ -61,7 +61,50 @@ function impSpeakers(speakers,token,hall){
                     linkedIn: element[5] === '#'?'':element[5],
                     facebook: element[6] === '#'?'':element[6],
                     twitter: element[7] === '#'?'':element[7],
-                    instagram: element[8] === ''?'':element[8],
+                    instagram: element[8] === '#'?'':element[8],
+                    country: element[11] === '#'?'':element[11],
+                    languages: element[12] === '#'?'':element[12],
+                    photo: element[13],
+                },{
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+token,
+                        'Accept': 'application/json'
+                    },
+                }).catch(e=>reject(console.error("axios "+element[1]+" error: "+e)))
+            }else{
+                element.forEach(el=>{
+                    console.log(el)
+                })
+            }
+        })
+        resolve(true);
+    }).catch(e=>console.error("impSpeakers error: "+e))
+}
+
+function updSpeakers(speakersCSV,speakerEventee,token,hall){
+    return new Promise((resolve,reject)=>{
+        //Aqui hago la peticion de todos los monos
+        speakersCSV.forEach(csv=>{
+            speakerEventee.forEach(eventee=>{
+                if((csv[0] === eventee.name) && csv[14] === undefined){
+                    csv.push(eventee.id);
+                }
+            })
+        })
+        speakersCSV.forEach(element=>{
+            console.log("ID "+element[14]+": "+ element[0] + " updated")
+            if(element[0] !== 'Title'){
+                axios.patch('https://eventee.co/public/api/v1/speaker/'+element[14],{
+                    name: element[0],
+                    company: element[1],
+                    position: element[2],
+                    bio: element[3],
+                    web: element[4] === '#'?'':element[4],
+                    linkedIn: element[5] === '#'?'':element[5],
+                    facebook: element[6] === '#'?'':element[6],
+                    twitter: element[7] === '#'?'':element[7],
+                    instagram: element[8] === '#'?'':element[8],
                     country: element[11] === '#'?'':element[11],
                     languages: element[12] === '#'?'':element[12],
                     photo: element[13],
@@ -92,5 +135,6 @@ function impWorkshops(workshops,token,hall){
 module.exports = {
     impLectures: impLectures,
     impWorkshops: impWorkshops,
-    impSpeakers: impSpeakers
+    impSpeakers: impSpeakers,
+    updSpeakers: updSpeakers
 }
