@@ -39,6 +39,28 @@ router.post('/speakersCSV',(req,res)=>{
     })
 });
 
+router.post('/workshopCSV',async (req,res)=>{
+    let result = await toWordpress.buildWorkshopCSV(req.body.workshopId,req.body.tokenPetition)
+    const fields = [
+        'id',
+        'firstName',
+        'lastName',
+        'name',
+        'email'
+    ];
+    const json2csvParser = new Parser({ fields });
+    const csv = json2csvParser.parse(result);
+    const nameFile = req.body.workshopName+Date.now()+'.csv'
+    var path='./controllers/csvs/'+nameFile; 
+    fs.writeFile(path, csv, function(err,data) {
+        if (err) {throw err;}
+        else{ 
+            res.download(path); // This is what you need
+        }
+    });
+    return res.status(200).send(nameFile);
+});
+
 router.post('/impLectures',(req,res)=>{
     toEventee.impLectures(req.body.lectures,req.body.token,req.body.hall).then(result=>{
         return res.status(200).send(result);

@@ -39,6 +39,42 @@ function buildCSV(token){
     
 }
 
+async function buildWorkshopCSV(workshopId,tokenPetition){
+    var attendees = [];
+    return new Promise(async (resolve,reject)=>{
+        var firstUrl = 'https://eventee.co/api/v1/booking/'+workshopId+'/attendees?order_by=order&ascending=1&per_page=50&page=1';
+
+        let response = await axios.get(firstUrl,{
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Bearer '+tokenPetition
+            },
+        })
+        for(var i=0;i<response.data.last_page;i++){
+            var secondUrl = 'https://eventee.co/api/v1/booking/'+workshopId+'/attendees?order_by=order&ascending=1&per_page=50&page='+(i+1);
+            let attendesDataPerPage = await axios.get(secondUrl,{
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer '+tokenPetition
+                },
+            })
+            attendesDataPerPage.data.data.forEach(attendee=>{
+                attendees.push({
+                    id: attendee.id,
+                    firstName: attendee.first_name,
+                    lastName: attendee.last_name,
+                    name: attendee.name,
+                    email: attendee.email 
+                })
+            })
+        }
+        resolve(attendees);
+    })
+}
+
 module.exports = {
-    buildCSV : buildCSV
+    buildCSV : buildCSV,
+    buildWorkshopCSV: buildWorkshopCSV
 }

@@ -16,7 +16,7 @@
                     <div class="input-group">
                         <span class="input-group-text">Ingresa el Token del Evento</span>
                         <textarea id="token" v-model="token" class="form-control" style="height: 100px;" placeholder="Ej: vB4DTHSTZR0Dz1aatUhlbNbaqgiYb4z91lJR3v6DpyZI9UkI1xu4jdKn5KZMRa3JuvT7gnZwBo5ak5ZVXJAEgohb02Eu18VLS34CT00AsmjfXsPHuFnmZSVyjGXhhRIsY5X5hThs8DqP1uHS8rIqQW8hWzlk8Zduhj6iXpV7W8YkjvN40ZTETl47kY4g29"></textarea>
-                      </div>
+                    </div>
                 </div>
                 <div class="col-md-2" style="margin: auto;">
                     <button class="btn btn-primary" v-on:click="HallsList">Check Event</button>
@@ -37,7 +37,23 @@
                     </div>
 
                 </div>
-                
+                <div class="row" style="margin: 10px;">
+                    <div class="col-md-5">
+                        <label for="workshop" class="form-label">Escoge el Workshop:</label>
+                        <select class="form-select" id="workshop" v-model="selectedWork" for="workshop">
+                            <option v-for="workshop in workshops" :key="workshop.text" :value="workshop">{{workshop.text}}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text">Ingresa el Token del Auth Bearer</span>
+                            <textarea id="tokenPetition" v-model="tokenPetition" class="form-control" style="height: 100px;" placeholder="Ej: vB4DTHSTZR0Dz1aatUhlbNbaqgiYb4z91lJR3v6DpyZI9UkI1xu4jdKn5KZMRa3JuvT7gnZwBo5ak5ZVXJAEgohb02Eu18VLS34CT00AsmjfXsPHuFnmZSVyjGXhhRIsY5X5hThs8DqP1uHS8rIqQW8hWzlk8Zduhj6iXpV7W8YkjvN40ZTETl47kY4g29"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-2" style="margin: auto;">
+                        <button class="btn btn-primary" v-on:click="expWorkshop">Export Attendees</button>
+                    </div>
+                </div>
                 <div class="row" style="margin: 10px;">
                     <div class="col-md-4">
                         <label for="Speakers" class="form-label">Import Speakers:</label>
@@ -87,9 +103,12 @@
             el: '#app',
             data: {
                 token: "",
+                tokenPetition: "",
                 halls: [],
                 selected: "",
-                speakers: []
+                speakers: [],
+                workshops: [],
+                selectedWork: {}
             },
             methods: {
                 HallsList: function(){
@@ -102,14 +121,19 @@
                     .then((response)=>{
                         var speakers = [];
                         var halls = [];
+                        var workshops = [];
                         response.data.halls.forEach(element => {
                             halls.push({text: element.name,value: element.id});
                         });
                         response.data.speakers.forEach(speaker=>{
                             speakers.push({id: speaker.id, name: speaker.name})
                         })
+                        response.data.workshops.forEach(workshop=>{
+                            workshops.push({text: workshop.name,value: workshop.booking_info[0].id})
+                        })
                         this.halls = halls;
-                        this.speakers = speakers
+                        this.speakers = speakers;
+                        this.workshops = workshops;
                     })
                 },
                 csvSpeakers: ()=>{
@@ -170,10 +194,23 @@
                         }
                     });
                 },
-                
+                expWorkshop: () =>{
+                    expWorkshops();   
+                }
 
             }
         })
+        function expWorkshops(){
+            $.ajax('/webservices/workshopCSV',{
+                type: 'POST',
+                data: {workshopId: app.$data.selectedWork.value,workshopName: app.$data.selectedWork.text,tokenPetition: app.$data.tokenPetition},
+                success: function (data, status, xhr) {
+                    console.log("Exito: ");
+                    Download('http://localhost:3000/'+'csvs/'+data)
+                }
+            });
+        }
+
         function impSpeakers(speakers){
             $.ajax('/webservices/impSpeakers',{
                 type: 'POST',
