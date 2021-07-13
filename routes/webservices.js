@@ -50,8 +50,8 @@ router.post('/workshopCSV',async (req,res)=>{
     ];
     const json2csvParser = new Parser({ fields });
     const csv = json2csvParser.parse(result);
-    const nameFile = req.body.workshopName+Date.now()+'.csv'
-    var path='./controllers/csvs/'+nameFile; 
+    const nameFile = 'eventee'+Date.now()+'.csv'
+    var path='./public/csvs/'+nameFile; 
     fs.writeFile(path, csv, function(err,data) {
         if (err) {throw err;}
         else{ 

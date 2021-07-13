@@ -8,6 +8,8 @@
         <script type="text/javascript" src="./papaparse.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://unpkg.com/vue-select@latest"></script>
+        <link rel="stylesheet" href="https://unpkg.com/vue-select@latest/dist/vue-select.css">
     </head>
     <body>
         <div class="container" id="app" style="margin-top: 3%;">
@@ -40,9 +42,8 @@
                 <div class="row" style="margin: 10px;">
                     <div class="col-md-5">
                         <label for="workshop" class="form-label">Escoge el Workshop:</label>
-                        <select class="form-select" id="workshop" v-model="selectedWork" for="workshop">
-                            <option v-for="workshop in workshops" :key="workshop.text" :value="workshop">{{workshop.text}}</option>
-                        </select>
+                        <v-select v-model="selectedWork" :options="workshops"></v-select>
+                        
                     </div>
                     <div class="col-md-5">
                         <div class="input-group">
@@ -98,6 +99,7 @@
         <iframe id="my_iframe" style="display:none;"></iframe>
     </body>
     <script>
+        Vue.component('v-select', VueSelect.VueSelect);
         Vue.config.devtools = true
         var app = new Vue({
             el: '#app',
@@ -129,7 +131,7 @@
                             speakers.push({id: speaker.id, name: speaker.name})
                         })
                         response.data.workshops.forEach(workshop=>{
-                            workshops.push({text: workshop.name,value: workshop.booking_info[0].id})
+                            workshops.push({label: workshop.name,value: workshop.booking_info[0].id})
                         })
                         this.halls = halls;
                         this.speakers = speakers;
@@ -203,7 +205,7 @@
         function expWorkshops(){
             $.ajax('/webservices/workshopCSV',{
                 type: 'POST',
-                data: {workshopId: app.$data.selectedWork.value,workshopName: app.$data.selectedWork.text,tokenPetition: app.$data.tokenPetition},
+                data: {workshopId: app.$data.selectedWork.value,workshopName: app.$data.selectedWork.label,tokenPetition: app.$data.tokenPetition},
                 success: function (data, status, xhr) {
                     console.log("Exito: ");
                     Download('http://localhost:3000/'+'csvs/'+data)
